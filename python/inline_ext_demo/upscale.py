@@ -11,7 +11,7 @@ from typing import Any
 
 import numpy as np
 from inline_core.config import models_dir
-from inline_core.extensions.api import ExtensionRegistrar, inline_node
+from inline_core.extensions.api import inline_node
 from inline_core.graph.descriptor import ParamField, Port, Widget
 from inline_core.graph.runners import NodeResult, NodeRunner
 from inline_core.graph.schema import PortKind
@@ -52,7 +52,3 @@ class Upscale(NodeRunner):
         image = np.asarray(inputs["image"][0])
         factor = int(params["scale"])
         return NodeResult(outputs={"image": np.repeat(np.repeat(image, factor, 0), factor, 1)})
-
-
-def register(reg: ExtensionRegistrar) -> None:
-    reg.nodes(Upscale)

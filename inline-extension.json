@@ -3,7 +3,7 @@
   "id": "demo",
   "name": "Inline Demo Extension",
   "version": "1.0.0",
-  "description": "A reference extension: two sub-extensions, custom nodes, and a model requirement.",
+  "description": "A reference extension: three nodes, one with a declared model requirement.",
   "author": "Inline Studio",
   "homepage": "https://github.com/inline-studio/inline-extension-demo",
   "license": "MIT",
@@ -11,22 +11,13 @@
   "pythonRequires": ">=3.11",
   "isolation": "shared",
   "requirements": [],
-  "subs": [
+  "entry": "inline_ext_demo:register",
+  "nodes": [
+    { "type": "demo/invert" },
+    { "type": "demo/brightness" },
     {
-      "id": "basic",
-      "title": "Basic Image Nodes",
-      "description": "Invert and adjust brightness. Pure numpy, no extra dependencies.",
-      "entry": "inline_ext_demo.basic:register",
-      "defaultEnabled": true,
-      "nodes": ["demo/invert", "demo/brightness"]
-    },
-    {
-      "id": "upscale",
-      "title": "Model Upscale",
-      "description": "Shows how a node declares the weights it needs. Off by default.",
-      "entry": "inline_ext_demo.upscale:register",
+      "type": "demo/upscale",
       "defaultEnabled": false,
-      "nodes": ["demo/upscale"],
       "models": [
         {
           "id": "realesrgan-x4",

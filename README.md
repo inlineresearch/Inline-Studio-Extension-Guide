@@ -3,12 +3,13 @@
 A reference extension for [Inline Studio](https://github.com/inline-studio/inline-studio). Copy this
 repo as the starting point for your own.
 
-It ships two independently toggleable sub-extensions:
+It ships three nodes, each independently toggleable by the user:
 
-| Sub-extension | Nodes | Shows |
-| --- | --- | --- |
-| `basic` | `demo/invert`, `demo/brightness` | The minimum: a decorated runner and a `register()` |
-| `upscale` | `demo/upscale` | Declaring weights, and a `options_from` model picker (off by default) |
+| Node | Shows |
+| --- | --- |
+| `demo/invert` | The minimum: a decorated `NodeRunner` |
+| `demo/brightness` | A second node from the same entry point |
+| `demo/upscale` | Declaring weights + an `options_from` model picker (off by default) |
 
 ## Install it
 
@@ -17,8 +18,9 @@ Extensions → **Install from URL** → this repo's URL, tag `v1.0.0`.
 ## Layout
 
 ```
-inline-extension.json          the manifest (identity, sub-extensions, dependencies, models)
+inline-extension.json          the manifest (identity, nodes, dependencies, models)
 python/inline_ext_demo/        your code - the package name is mandatory (see below)
+  __init__.py                  the single register() entry point
   basic.py                     nodes with no extra dependencies
   upscale.py                   a node that needs a weight file
 tests/test_nodes.py            plain pytest
@@ -46,12 +48,22 @@ class Invert(NodeRunner):
     def run(self, node, inputs, ctx) -> NodeResult:
         ...
 
-def register(reg: ExtensionRegistrar) -> None:
-    reg.nodes(Invert)
 ```
 
-The canvas builds the whole node UI from that descriptor: ports, the settings sidebar, take
+Then hand every node to the registrar from your package's single entry point:
+
+```python
+# python/inline_ext_demo/__init__.py
+def register(reg: ExtensionRegistrar) -> None:
+    reg.nodes(Invert, Brightness, Upscale)
+```
+
+The canvas builds the whole node UI from each descriptor: ports, the settings sidebar, take
 history. There is no frontend code to write.
+
+Declare every node in the manifest's `nodes` array. Users toggle nodes individually, and because
+your code is imported once, switching one on never needs a restart. Give a node
+`"defaultEnabled": false` to ship it off by default.
 
 Set `output_kind=MediaKind.IMAGE` and `produces_takes = True` when your node should become a Frame
 with its own take history.
@@ -74,14 +86,15 @@ with both versions named. Align with the host, or say so in your README.
 
 ## Models
 
-Declare weights and Inline handles the rest: the download popup, progress, and the
-`options_from` dropdown all work with no code:
+Declare weights on the node that needs them and Inline handles the rest: the download popup,
+progress, and the `options_from` dropdown all work with no code:
 
 ```json
-"models": [
+"nodes": [
+  { "type": "demo/upscale", "models": [
   { "id": "realesrgan-x4", "label": "Real-ESRGAN x4", "category": "upscale_models",
     "repo": "ai-forever/Real-ESRGAN", "repoFile": "RealESRGAN_x4.pth",
-    "filename": "RealESRGAN_x4.pth", "approxBytes": 67040989 }
+      "filename": "RealESRGAN_x4.pth", "approxBytes": 67040989 } ] }
 ]
 ```
 

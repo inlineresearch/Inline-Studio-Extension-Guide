@@ -47,14 +47,14 @@ def test_upscale_reports_a_missing_weight_file_clearly() -> None:
         _run(Upscale(), image, model="definitely-not-installed.pth")
 
 
-def test_every_node_declares_the_type_the_manifest_lists() -> None:
+def test_the_entry_point_registers_exactly_what_the_manifest_declares() -> None:
     import json
     from pathlib import Path
 
     manifest = json.loads(
         (Path(__file__).parent.parent / "inline-extension.json").read_text(encoding="utf-8")
     )
-    declared = {node for sub in manifest["subs"] for node in sub["nodes"]}
+    declared = {node["type"] for node in manifest["nodes"]}
     implemented = {
         cls.__inline_descriptor__.type for cls in (Invert, Brightness, Upscale)
     }
