@@ -89,7 +89,7 @@ Declare weights and Inline handles the rest: the download popup, progress, and t
 `loras`, `controlnet`, `checkpoints`, `clip_vision`, `upscale_models`, `embeddings`). Never download
 weights yourself at import or run time.
 
-## What the security review flags
+## Security review
 
 Every install is scanned, and the same scan runs in registry CI.
 
